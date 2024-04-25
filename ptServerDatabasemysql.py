@@ -68,7 +68,7 @@ def setupDatabase():
         outputLocation TEXT,
         workWeek varchar(30) NOT NULL,
         sectionTop varchar(30) NOT NULL,
-        nameOfBlock varchar(30) NOT NULL,
+        blockName varchar(30) NOT NULL,
         projectName varchar(30) NOT NULL,
         runTime INT
     );
@@ -82,7 +82,7 @@ def setupDatabase():
         commandId INT,
         workWeek varchar(20) NOT NULL,
         sectionTop varchar(30) NOT NULL,
-        nameOfBlock varchar(30) NOT NULL,
+        blockName varchar(30) NOT NULL,
         projectName varchar(30) NOT NULL,
         heartBeat INT NOT NULL,
         totalRunTime INT
@@ -94,6 +94,7 @@ def setupDatabase():
         corner varchar(100) NOT NULL,
         workWeek varchar(100) NOT NULL,
         projectName varchar(100) NOT NULL,
+        blockName varchar(30) NOT NULL,
         cellName varchar(100) NOT NULL,
         incrementalDelay float NOT NULL,
         transitionDelay float NOT NULL,
@@ -157,7 +158,7 @@ def writeToMachineTrackerTable(dataSql):
     #conn = sqlite3.connect(databaseLocation)
     cursor = conn.cursor(dictionary = True)
     print(dataSql)
-    sql = "INSERT INTO machineTrackerTable (machineName,corner,status,loads,commandId,workWeek,projectName) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    sql = "INSERT INTO machineTrackerTable (machineName,corner,status,loads,commandId,workWeek,projectName,blockName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
     #code.interact(local=locals())
     cursor.execute(sql, dataSql)
     conn.commit()
