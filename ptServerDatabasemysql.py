@@ -132,9 +132,9 @@ def writeToCommandInputTable(command):
     #cursor = conn.cursor()
     cursor = conn.cursor(dictionary=True)
     datas = [
-        (command, corner, user, globalVariable.project, globalVariable.runName ),
+        (command, corner, user, globalVariable.project, globalVariable.runName, globalVariable.blockName ),
     ]   
-    sql = "INSERT INTO commandInputTable (command, corner, user, projectName, workWeek) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO commandInputTable (command, corner, user, projectName, workWeek, blockName) VALUES (%s, %s, %s, %s, %s, %s)"
     #code.interact(local=locals())
     for data in datas:
         cursor.execute(sql, data)
@@ -304,6 +304,21 @@ def getAllWorkWeek():
     #code.interact(local=locals())
     unique_work_weeks = sorted({row['workWeek'] for row in sqlOutput})
     return unique_work_weeks
+
+
+
+def getAllblockName():
+    config = configparser.ConfigParser()
+    project = globalVariable.project
+    config.read(globalVariable.configFile)
+    databaseLocation = config[project]["database"]
+    table = "machineTrackerTable"
+    column = ["blockName"]
+    condition = " where projectName = \'"+project+"\'"
+    sqlOutput = get_values_from_database(databaseLocation,table,column,condition)
+    #code.interact(local=locals())
+    unique_block_name = sorted({row['blockName'] for row in sqlOutput})
+    return unique_block_name
 
 def getAllNotServicedJobs():
     config = configparser.ConfigParser()

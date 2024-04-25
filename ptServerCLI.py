@@ -176,6 +176,10 @@ add_command("load_work_week",load_work_week, "work_week","set the work week loca
 add_command("show_work_week",show_work_week)
 add_command("current_work_week",current_work_week)
 
+add_command("load_block",load_block, "block","set the block name")
+add_command("show_block",show_block)
+add_command("current_block",current_block)
+add_command("show_info",show_info)
 # Define a function to handle tab completion
 def completer(text, state):
     options = [cmd for cmd in commands.keys() if cmd.startswith(text)]
@@ -194,6 +198,20 @@ if __name__ == "__main__":
     console = Console()
     version = 1.0
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
+    ## show block ; show work week ; show corner
+    command = "show_block"
+    option = ""
+    run_command(command, option)
+    globalVariable.blockName = input("give the block name: ")
+    command = "show_work_week"
+    run_command(command, option)
+    globalVariable.runName = input("give the run name: ")
+    command = "show_corner"
+    run_command(command, option)
+    globalVariable.corner = input("give the corner name: ")
+    globalVariable.userLocation = input("give the location to dump the reports: ")
+    globalVariable.project = os.environ.get('PROJ_NAME')
+
 
     while True:
         current_time = datetime.datetime.now()

@@ -52,15 +52,16 @@ config = configparser.ConfigParser()
 
 parser = argparse.ArgumentParser(description="User arg1")
 parser.add_argument("-R", "--restore", action="store_true", help="Restore the project")
-parser.add_argument("-P", "--project", dest="project",default="nil" , help="Restore the project")
+#parser.add_argument("-P", "--project", dest="project",default="nil" , help="Restore the project")
 parser.add_argument("-W", "--run", dest="runName",default="nil" , help="Run name")
 parser.add_argument("-N", "--name", dest="blockName",default="nil" , help="block Name ")
 args = parser.parse_args()
 
-if args.project == "nil":
-    project = globalVariable.project
-else:
-    project = args.project
+globalVariable.project = os.environ.get("PROJ_NAME")
+#if args.project == "nil":
+project = globalVariable.project
+#else:
+#    project = args.project
 
 if args.blockName == "nil":
     blockName = globalVariable.blockName

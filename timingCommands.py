@@ -253,6 +253,24 @@ def show_work_week(option=None):
 def current_work_week(option=None):
     print("[bold green]the current workweek : [/bold green]", globalVariable.runName)
 
+
+def load_block(blockName):
+    globalVariable.blockName = blockName
+    print("[bold green]defined the block name : [/bold green]", globalVariable.blockName)
+
+def show_block(option=None):
+    print("[bold green]defined the block name : [/bold green]", getAllblockName())
+
+def current_block(option=None):
+    print("[bold green]the current block name is : [/bold green]", globalVariable.blockName)
+
+def show_info(option=None):
+    print("[bold green]Project : [/bold green]", globalVariable.project)
+    print("[bold green]block name : [/bold green]", globalVariable.blockName)
+    print("[bold green]work week : [/bold green]", globalVariable.runName)
+    print("[bold green]corner : [/bold green]", globalVariable.corner)
+
+
 def copy_file(source_file, destination_file):
     try:
         shutil.copy(source_file, destination_file)
