@@ -180,6 +180,8 @@ add_command("load_block",load_block, "block","set the block name")
 add_command("show_block",show_block)
 add_command("current_block",current_block)
 add_command("show_info",show_info)
+add_command("compare_timing",compare_timing, "command workWeeks corners","")
+
 # Define a function to handle tab completion
 def completer(text, state):
     options = [cmd for cmd in commands.keys() if cmd.startswith(text)]

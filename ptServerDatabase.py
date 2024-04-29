@@ -77,6 +77,22 @@ def setupDatabase():
         FOREIGN KEY(commandId) REFERENCES commandInputTable(commandId)
     );
 
+    CREATE TABLE IF NOT EXISTS compareInputTable (
+        compareId INTEGER PRIMARY KEY,
+        commandID INTEGER NOT NULL,
+        pathName TEXT NOT NULL,
+        comparePoint INTEGER NOT NULL,
+        startPoint TEXT NOT NULL,
+        endPoint TEXT NOT NULL,
+        pinsList TEXT NOT NULL,
+        slack TEXT NOT NULL,
+        corner TEXT NOT NULL,
+        workWeek TEXT NOT NULL,
+        sectionTop TEXT NOT NULL,
+        nameOfBlock TEXT NOT NULL,
+        projectName TEXT NOT NULL
+    );
+
     create table if not exists userVariablesTable (
         variableId INTEGER PRIMARY KEY,
         variableName TEXT NOT NULL,

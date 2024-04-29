@@ -4,6 +4,7 @@ import globalVariable
 from rich import print
 import shutil
 import datetime
+import re
 
 def get_cells (parser):
     print("get_cells cells ",globalVariable.corner)
@@ -125,6 +126,7 @@ def report_timing(parser):
     completCommandTime = showReportEnd - completCommandEnd
     formatted_time = completCommandTime.total_seconds()
     print("time taken to print file : ",formatted_time)
+    return(commandId)
 
 
 
@@ -269,6 +271,100 @@ def show_info(option=None):
     print("[bold green]block name : [/bold green]", globalVariable.blockName)
     print("[bold green]work week : [/bold green]", globalVariable.runName)
     print("[bold green]corner : [/bold green]", globalVariable.corner)
+
+
+def compare_timing(command):
+    print(command)
+    #code.interact(local=locals())
+    pattern = r"-work_week\s+(.*?)\s+-corner\s+(.*?)-command {(.*)}"
+    import re
+    match = re.match(pattern,command)
+    if match:
+        workWeeks = match.group(1)
+        corners = match.group(2)
+        command = match.group(3)
+        if "-nosplit" not in command:
+            command += " -nosplit "
+        if "-input_pins" not in command:
+            command += " -input_pins "
+        print("this command will compare the timing between 2 runs for command ", command, " on work week ",workWeeks," and corners ",corners)
+        print("run command ",command," on work week ",workWeeks.split(":")[0]," and corner ",corners.split(":")[0])
+        #code.interact(local=locals())
+        load_work_week(workWeeks.split(":")[0])
+        load_corner(corners.split(":")[0])
+        command = " ".join(command.split(" ")[1:])
+        commandId = report_timing(command)
+        print(globalVariable.tempLocation)
+        returnData = extractPathInfo(globalVariable.tempLocation)
+        comparePoint = 0
+        for path in returnData:
+            compareInputData = commandId,path[0],comparePoint,path[1],path[2],path[3],path[4],corners.split(":")[0],workWeeks.split(":")[0],globalVariable.blockName,globalVariable.blockName,globalVariable.project
+            print(compareInputData)
+            comparePoint +=1
+    else:
+        print("the input command format is incorrect please follow the example\ncompare_timing -work_week 17p2:17p3 -corner 85:55 -command {report_timing -from abc}")
+
+def extractPathInfo(fileName):
+    pathCount = 1
+    with open(fileName,'r') as file:
+        lines = file.readlines()
+        sp_pattern = r"\s+Startpoint: (.*)"
+        ep_pattern = r"\s+Endpoint: (.*)"
+        slack_pattern = r"\s+slack \(.*\)\s+([-]?\d+.\d+).*"
+        path_start_pattern = r"\s+clock network delay.*"
+        pin_pattern = r"\s+(.*?)\s.*"
+        spFlag = 0
+        epFlag = 0
+        pathStartFlag = 0
+        slackFlag = 0
+        comparePointId = 0
+        returnData = []
+        pinsList = []
+        pathName = "path"+str(pathCount)
+        print("path name :",pathName)
+        for line in lines:
+            if slackFlag:
+                slackFlag = 0
+                pathCount += 1
+                pathName = "path"+str(pathCount)
+                #print("\n\npath name :",pathName)
+            match = re.match(slack_pattern,line)
+            if match:
+                slackFlag = 1
+                slack = match.group(1)
+                #print("slack:", slack)
+                #print("commandId: ",commandId,"pathName: ",pathName," comparePoint: ",comparePointId,"sp: ",startPoint," ep: ",endPoint," pins: ",pinsList," slack: ",slack)
+                tempList = [pathName,startPoint,endPoint,pinsList,slack]
+                returnData.append(tempList)
+                pinsList = []
+            if pathStartFlag:
+                if (startPoint not in line):
+                    if (endPoint in line):
+                        pathStartFlag = 0
+                        spFlag = 0
+                        epFlag = 0
+                    match = re.match(pin_pattern,line)
+                    if match and pathStartFlag:
+                        #print(match.group(1))
+                        pinsList.append(match.group(1))
+            match = re.match(sp_pattern,line)
+            if match:
+                startPoint = match.group(1)
+                spFlag = 1
+                #print("startPoint:", startPoint)
+            if spFlag:
+                match = re.match(ep_pattern,line)
+                if match:
+                    endPoint = match.group(1)
+                    epFlag = 1
+                    #print("endPoint:", endPoint)
+            if epFlag:
+                match = re.match(path_start_pattern,line)
+                if match:
+                    pathStartFlag = 1
+    return returnData
+
+
 
 
 def copy_file(source_file, destination_file):
