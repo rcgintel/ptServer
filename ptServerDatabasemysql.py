@@ -104,6 +104,22 @@ def setupDatabase():
         totalDelay float NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS compareInputTable (
+        compareId INTEGER PRIMARY KEY,
+        commandID INTEGER NOT NULL,
+        pathName TEXT NOT NULL,
+        comparePoint INTEGER NOT NULL,
+        startPoint TEXT NOT NULL,
+        endPoint TEXT NOT NULL,
+        pinsList TEXT NOT NULL,
+        slack TEXT NOT NULL,
+        corner TEXT NOT NULL,
+        workWeek TEXT NOT NULL,
+        sectionTop TEXT NOT NULL,
+        nameOfBlock TEXT NOT NULL,
+        projectName TEXT NOT NULL
+    );
+
     create table if not exists userVariablesTable (
         variableId INT AUTO_INCREMENT PRIMARY KEY,
         variableName varchar(30) NOT NULL,
