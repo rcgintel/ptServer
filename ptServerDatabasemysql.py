@@ -202,6 +202,21 @@ def writeToUserVariablesTable(dataSql):
     conn.commit()
     conn.close()
 
+def writeTocompareInputTable(dataSql,returnlastrow = False):
+    """
+    Writes data initially to the Compare Input table for compare_timing command.
+    Used in timingCommands.py
+    """
+    sql = "INSERT INTO compareInputTable (commandID,pathName,comparePoint,startPoint,endPoint,pinsList,slack,corner,workWeek,sectionTop,nameOfBlock,projectName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    conn = connectMySql()
+    cursor = conn.cursor(dictionary = True)
+    cursor.execute(sql, dataSql)
+    if returnlastrow:
+        id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    if returnlastrow:
+        return id
 
 def getCompleteFromCommandInputTable(commandId):
     """
