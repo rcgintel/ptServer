@@ -43,6 +43,8 @@ Commands
 
     > LIST of available commands in the CLI tool
  
+ <details> Commands List 
+        
 |SlNo| Command | Description |
 |----:|-----|-----------|
 |1|get_cells | same as PT command|
@@ -72,6 +74,7 @@ Commands
 |25|show_info| show the block name work week and the corner which we are accessing|
 |26|history| will give the list of commands that we have executed|
 |27|compare_timing| we can compare 2 timing reports different work week and corner (incomplete)|
+</details>
 
 #
 
