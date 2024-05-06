@@ -9,3 +9,6 @@ userLocation = ""
 globalDatabaseName = "rcg"
 runName = "default"
 blockName = "default"
+commandHistory = []
+displayResult = 0
+historyLimit = 20

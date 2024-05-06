@@ -212,26 +212,37 @@ def current_corner(option=None):
    
 
 def show_report(location):
-    print("This command will print the entire report from", location)
-    directory_path, file_name = os.path.split(location)
-    if globalVariable.userLocation == "":
-        globalVariable.userLocation = input("please enter a location to dump the script: ")
-    if globalVariable.userLocation != "":
-        print ("need to copy the files to user location ", globalVariable.userLocation, " \nresolved permission issue")
-        copy_file(location, globalVariable.userLocation)
-        #code.interact(local=locals())
-        #permission = check_permissions_recursive(location)
-        if os.access(location, os.W_OK):
-            os.remove(location)
-        else:
-            print("please ask the pt session owner to give permission to remove the files")
-        location = globalVariable.userLocation+"/"+file_name
-        globalVariable.tempLocation = location
-    
-    with open(location, 'r') as file:
-        # Read the file line by line and print each line
-        for line in file:
-            print(line, end='')
+    if globalVariable.displayResult:
+        print("This command will print the entire report from", location)
+        directory_path, file_name = os.path.split(location)
+        if globalVariable.userLocation == "":
+            globalVariable.userLocation = input("please enter a location to dump the script: ")
+        if globalVariable.userLocation != "":
+            print ("need to copy the files to user location ", globalVariable.userLocation, " \nresolved permission issue")
+            copy_file(location, globalVariable.userLocation)
+            #code.interact(local=locals())
+            #permission = check_permissions_recursive(location)
+            if os.access(location, os.W_OK):
+                os.remove(location)
+            else:
+                print("please ask the pt session owner to give permission to remove the files")
+            location = globalVariable.userLocation+"/"+file_name
+            globalVariable.tempLocation = location
+
+        with open(location, 'r') as file:
+            # Read the file line by line and print each line
+            for line in file:
+                print(line, end='')
+    else:
+        print("reports are not displayed run set_app_var displayResult 1 to enable displaying the reports")
+
+def set_app_var(option):
+    print(option)
+    appName = option.split(" ")[0]
+    appValue = int(option.split(" ")[1])
+    setattr(globalVariable,appName,appValue)
+    print(globalVariable.displayResult)
+    #code.interact(local=locals())
 
 
 def set_user_location(location):
@@ -272,6 +283,15 @@ def show_info(option=None):
     print("[bold green]work week : [/bold green]", globalVariable.runName)
     print("[bold green]corner : [/bold green]", globalVariable.corner)
 
+def history(option=None):
+    print("[bold green]Command History : [/bold green]")
+    commandNumber = 0
+    #code.interact(local=locals())
+    for hisCommand in globalVariable.commandHistory[-globalVariable.historyLimit:]:
+        print(str(commandNumber)+") "+hisCommand)
+        commandNumber +=1
+    print("[bold green] increase the history limit using set_app_var historyLimit <int> : [/bold green]")
+
 
 def compare_timing(command):
     print(command)
@@ -297,10 +317,14 @@ def compare_timing(command):
         print(globalVariable.tempLocation)
         returnData = extractPathInfo(globalVariable.tempLocation)
         comparePoint = 0
+
         for path in returnData:
-            compareInputData = commandId,path[0],comparePoint,path[1],path[2],path[3],path[4],corners.split(":")[0],workWeeks.split(":")[0],globalVariable.blockName,globalVariable.blockName,globalVariable.project
+            compareInputData = (os.environ.get("USER"),commandId,path[0],comparePoint,path[1],path[2],path[3],path[4],corners.split(":")[0],workWeeks.split(":")[0],globalVariable.blockName,globalVariable.blockName,globalVariable.project)
             print(compareInputData)
+            writeTocompareInputTable(compareInputData)
             comparePoint +=1
+        childData = zip(corners.split(":")[1:],workWeeks.split(":")[1:])
+        print(childData)
     else:
         print("the input command format is incorrect please follow the example\ncompare_timing -work_week 17p2:17p3 -corner 85:55 -command {report_timing -from abc}")
 
@@ -334,6 +358,8 @@ def extractPathInfo(fileName):
                 slack = match.group(1)
                 #print("slack:", slack)
                 #print("commandId: ",commandId,"pathName: ",pathName," comparePoint: ",comparePointId,"sp: ",startPoint," ep: ",endPoint," pins: ",pinsList," slack: ",slack)
+                pinsList = ":".join(pinsList)
+                #code.interact(local=locals())
                 tempList = [pathName,startPoint,endPoint,pinsList,slack]
                 returnData.append(tempList)
                 pinsList = []

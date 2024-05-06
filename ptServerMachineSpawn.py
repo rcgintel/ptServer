@@ -79,6 +79,7 @@ machineSetup = config[project]["machineSetup"]
 count = 0
 
 setupDatabase()
+## removed the fork task
 daemon = Thread(target=background_task, args=(60,), daemon=True, name='Background')
 daemon.start()
 #background_task(60)
@@ -156,7 +157,6 @@ while (flag):
     ## get the database
     #database = config[project]["database"]
     #code.interact(local=locals())
-    
     notServiced = getAllNotServicedJobs()
     #code.interact(local=locals())
     for job in notServiced:

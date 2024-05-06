@@ -105,7 +105,8 @@ def setupDatabase():
     );
 
     CREATE TABLE IF NOT EXISTS compareInputTable (
-        compareId INTEGER PRIMARY KEY,
+        compareId INT AUTO_INCREMENT PRIMARY KEY,
+        user TEXT NOT NULL,
         commandID INTEGER NOT NULL,
         pathName TEXT NOT NULL,
         comparePoint INTEGER NOT NULL,
@@ -207,9 +208,11 @@ def writeTocompareInputTable(dataSql,returnlastrow = False):
     Writes data initially to the Compare Input table for compare_timing command.
     Used in timingCommands.py
     """
-    sql = "INSERT INTO compareInputTable (commandID,pathName,comparePoint,startPoint,endPoint,pinsList,slack,corner,workWeek,sectionTop,nameOfBlock,projectName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    sql = "INSERT INTO compareInputTable (user,commandID,pathName,comparePoint,startPoint,endPoint,pinsList,slack,corner,workWeek,sectionTop,nameOfBlock,projectName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    #code.interact(local=locals())
     conn = connectMySql()
     cursor = conn.cursor(dictionary = True)
+
     cursor.execute(sql, dataSql)
     if returnlastrow:
         id = cursor.lastrowid
