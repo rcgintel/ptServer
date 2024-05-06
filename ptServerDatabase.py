@@ -77,6 +77,7 @@ def setupDatabase():
         FOREIGN KEY(commandId) REFERENCES commandInputTable(commandId)
     );
 
+
     create table if not exists userVariablesTable (
         variableId INTEGER PRIMARY KEY,
         variableName TEXT NOT NULL,

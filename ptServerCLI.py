@@ -180,6 +180,12 @@ add_command("load_block",load_block, "block","set the block name")
 add_command("show_block",show_block)
 add_command("current_block",current_block)
 add_command("show_info",show_info)
+add_command("history",history)
+add_command("set_app_var",set_app_var)
+
+
+add_command("compare_timing",compare_timing, "command workWeeks corners","")
+
 # Define a function to handle tab completion
 def completer(text, state):
     options = [cmd for cmd in commands.keys() if cmd.startswith(text)]
@@ -201,6 +207,7 @@ if __name__ == "__main__":
     ## show block ; show work week ; show corner
     command = "show_block"
     option = ""
+    globalVariable.project = os.environ.get("PROJ_NAME")
     run_command(command, option)
     globalVariable.blockName = input("give the block name: ")
     command = "show_work_week"
@@ -217,7 +224,7 @@ if __name__ == "__main__":
         current_time = datetime.datetime.now()
         formatted_time = current_time.strftime("%H:%M:%S")
         user_input = Prompt.ask("[bold cyan]"+formatted_time+" ptServer>[/bold cyan]")
-
+        globalVariable.commandHistory.append(user_input.lower())
         if user_input == "":
             print("enter command")
             continue

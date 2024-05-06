@@ -104,6 +104,23 @@ def setupDatabase():
         totalDelay float NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS compareInputTable (
+        compareId INT AUTO_INCREMENT PRIMARY KEY,
+        user TEXT NOT NULL,
+        commandID INTEGER NOT NULL,
+        pathName TEXT NOT NULL,
+        comparePoint INTEGER NOT NULL,
+        startPoint TEXT NOT NULL,
+        endPoint TEXT NOT NULL,
+        pinsList TEXT NOT NULL,
+        slack TEXT NOT NULL,
+        corner TEXT NOT NULL,
+        workWeek TEXT NOT NULL,
+        sectionTop TEXT NOT NULL,
+        nameOfBlock TEXT NOT NULL,
+        projectName TEXT NOT NULL
+    );
+
     create table if not exists userVariablesTable (
         variableId INT AUTO_INCREMENT PRIMARY KEY,
         variableName varchar(30) NOT NULL,
@@ -186,6 +203,23 @@ def writeToUserVariablesTable(dataSql):
     conn.commit()
     conn.close()
 
+def writeTocompareInputTable(dataSql,returnlastrow = False):
+    """
+    Writes data initially to the Compare Input table for compare_timing command.
+    Used in timingCommands.py
+    """
+    sql = "INSERT INTO compareInputTable (user,commandID,pathName,comparePoint,startPoint,endPoint,pinsList,slack,corner,workWeek,sectionTop,nameOfBlock,projectName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    #code.interact(local=locals())
+    conn = connectMySql()
+    cursor = conn.cursor(dictionary = True)
+
+    cursor.execute(sql, dataSql)
+    if returnlastrow:
+        id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    if returnlastrow:
+        return id
 
 def getCompleteFromCommandInputTable(commandId):
     """
