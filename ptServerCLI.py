@@ -14,9 +14,21 @@ import readline
 import globalVariable
 import datetime
 import re
+import logging
+from log_config import *
+
+##setup logging
+log_banner = """
+************************************
+            PT SERVER CLI
+************************************
+"""
+logger = logging.getLogger(__name__)
 
 # Define a dictionary to store the commands and their options
 commands = {}
+
+
 
 # Function to add a new command
 def add_command(command_name, function, options=[], helpM=""):
@@ -204,6 +216,8 @@ if __name__ == "__main__":
     console = Console()
     version = 1.0
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
+    logger.debug(log_banner)
+    logger.debug("PTSERVER CLI INITIAITED AT %s by %s",os.getcwd(),os.environ.get("USER"))
     ## show block ; show work week ; show corner
     command = "show_block"
     option = ""
@@ -219,6 +233,12 @@ if __name__ == "__main__":
     globalVariable.userLocation = input("give the location to dump the reports: ")
     globalVariable.project = os.environ.get('PROJ_NAME')
 
+    logger.debug(" Current project: {globalVariable.project}")
+    logger.debug(" Current blockName: {globalVariable.blockName}")
+    logger.debug(" Current runName: {globalVariable.runName}")
+    logger.debug(" Current corner: {globalVariable.corner}")
+    logger.debug(" Current userLocation: {globalVariable.userLocation}")
+    
 
     while True:
         current_time = datetime.datetime.now()
