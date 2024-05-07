@@ -6,19 +6,33 @@ import shutil
 import datetime
 import re
 
+from log_config import *
+
+logger = logging.getLogger(__name__)
+
 def get_cells (parser):
     print("get_cells cells ",globalVariable.corner)
     if parser == None:
         command = "get_cells "
     else:
         command = "get_cells "+ parser
+
+    
+    logger.debug("Writing to CommandInputTable")
+    databaseWriteStart = datetime.datetime.now()
+
     commandId = writeToCommandInputTable(command)
+
+    databaseWriteEnd = datetime.datetime.now()
+    logger.debug(f"Write completed. Time: {(databaseWriteStart - databaseWriteEnd).total_seconds()}")
     print("please wait for the command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
         print("report generated in location ",location)
         globalVariable.tempLocation = location
+        cmdCompletionTime = datetime.datetime.now()
+        logger.debug(f"Command completed in {(databaseWriteStart - cmdCompletionTime).total_seconds}")
     show_report(location)
 
 def get_pins (parser):
