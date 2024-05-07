@@ -54,7 +54,7 @@ def run_command(command, option=None):
                 #return
         function(option)
     else:
-        print("Command not found")
+        logger.error("Command not found")
 
 
 
@@ -66,6 +66,8 @@ def start_gui(option=None):
     import queue
 
     globalVariable.guiMode = 1
+    logger.debug("Started GUI Mode")
+
     class TerminalApp:
         def change_button_color(self, event, idx, buttons):
             button = event.widget
@@ -76,6 +78,7 @@ def start_gui(option=None):
         def destroyMaster(self):
             globalVariable.guiMode = 0
             self.master.destroy()
+            logger.debug("GUI closed")
         
         def generateOutput(self, event):
             print(self.entry_widget.get())
@@ -155,7 +158,7 @@ def start_gui(option=None):
     root.mainloop()
 
 
-    print("starting the gui for ptServer")
+    logger.info("Starting GUI for ptServer")
 
 
 
@@ -216,8 +219,10 @@ if __name__ == "__main__":
     console = Console()
     version = 1.0
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
+
     logger.debug(log_banner)
     logger.debug("PTSERVER CLI INITIAITED AT %s by %s",os.getcwd(),os.environ.get("USER"))
+
     ## show block ; show work week ; show corner
     command = "show_block"
     option = ""
@@ -249,12 +254,14 @@ if __name__ == "__main__":
             print("enter command")
             continue
         if user_input.lower() == "exit":
-            print ("exiting PTServer\nThanks for using PTServer")
+            logger.info("exiting PTServer\nThanks for using PTServer")
             break
         if user_input.lower().startswith("source"):
             match = re.match(r"source\s*(.*)", user_input)
             fileSource = match.group(1)
-            print(fileSource)
+
+            logger.info(f"Sourcing file {fileSource}")
+
             try:
                 with open(fileSource, 'r') as file:
                     for line in file:
@@ -266,9 +273,9 @@ if __name__ == "__main__":
                         print("option: ",option)
                         run_command(command, option)
             except FileNotFoundError:
-                print("The file does not exist.")
+                logger.error(f"The file{fileSource} does not exist")
             except Exception as e:
-                print("An error occurred:", e)
+                logger.error(f"An error has occured while sourcing {fileSource}")
 
         else:
             parts = user_input.split()
