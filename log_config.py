@@ -25,6 +25,7 @@ client_logger.addHandler(client_file_handler)
 
 client_console_handler = logging.StreamHandler()
 client_console_handler.setLevel(CLIENT_CONSOLE_LEVEL)
+client_console_handler.setFormatter(client_formatter)
 client_logger.addHandler(client_console_handler)
 
 #configure server logger
@@ -51,4 +52,5 @@ server_logger.addHandler(server_file_handler)
 
 server_console_handler = logging.StreamHandler()
 server_console_handler.setLevel(SERVER_CONSOLE_LEVEL)
+server_console_handler.setFormatter(server_formatter)
 server_logger.addHandler(server_console_handler)
