@@ -16,6 +16,7 @@ CLIENT_LOG_FILENAME = f'ptServerCLI_{os.environ.get("USER")}_{datetime.datetime.
 
 
 client_logger = logging.getLogger('client_logger')
+client_logger.setLevel(CLIENT_LOG_LEVEL)
 client_file_handler = logging.FileHandler(CLIENT_LOG_FILENAME,mode = 'w')
 client_file_handler.setLevel(CLIENT_LOG_LEVEL)
 client_file_formatter = logging.Formatter(CLIENT_LOG_FORMAT)
