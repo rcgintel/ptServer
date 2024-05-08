@@ -23,7 +23,7 @@ def get_cells (parser):
     commandId = writeToCommandInputTable(command)
 
     databaseWriteEnd = datetime.datetime.now()
-    client_logger.debug(f"Write completed. Time: {(databaseWriteStart - databaseWriteEnd).total_seconds()}")
+    client_logger.debug(f"Write completed. Time: {(databaseWriteEnd -  databaseWriteStart).total_seconds()}")
     print("please wait for the command to be serviced")
     location = None
     while location == None:
@@ -31,7 +31,7 @@ def get_cells (parser):
         print("report generated in location ",location)
         globalVariable.tempLocation = location
         cmdCompletionTime = datetime.datetime.now()
-        client_logger.debug(f"Command completed in {(databaseWriteStart - cmdCompletionTime).total_seconds}")
+        client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds}")
     show_report(location)
 
 def get_pins (parser):
