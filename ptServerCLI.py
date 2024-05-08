@@ -237,11 +237,11 @@ if __name__ == "__main__":
     globalVariable.userLocation = input("give the location to dump the reports: ")
     globalVariable.project = os.environ.get('PROJ_NAME')
 
-    client_logger.debug(" Current project: {globalVariable.project}")
-    client_logger.debug(" Current blockName: {globalVariable.blockName}")
-    client_logger.debug(" Current runName: {globalVariable.runName}")
-    client_logger.debug(" Current corner: {globalVariable.corner}")
-    client_logger.debug(" Current userLocation: {globalVariable.userLocation}")
+    client_logger.debug(f" Current project: {globalVariable.project}")
+    client_logger.debug(f" Current blockName: {globalVariable.blockName}")
+    client_logger.debug(f" Current runName: {globalVariable.runName}")
+    client_logger.debug(f" Current corner: {globalVariable.corner}")
+    client_logger.debug(f" Current userLocation: {globalVariable.userLocation}")
     
 
     while True:
