@@ -19,13 +19,14 @@ client_logger = logging.getLogger('client_logger')
 client_logger.setLevel(CLIENT_LOG_LEVEL)
 client_file_handler = logging.FileHandler(CLIENT_LOG_FILENAME,mode = 'w')
 client_file_handler.setLevel(CLIENT_LOG_LEVEL)
-client_formatter = logging.Formatter(CLIENT_LOG_FORMAT)
-client_file_handler.setFormatter(client_formatter)
+client_file_formatter = logging.Formatter(CLIENT_LOG_FORMAT)
+client_file_handler.setFormatter(client_file_formatter)
 client_logger.addHandler(client_file_handler)
 
 client_console_handler = logging.StreamHandler()
 client_console_handler.setLevel(CLIENT_CONSOLE_LEVEL)
-client_console_handler.setFormatter(client_formatter)
+client_console_formatter = logging.Formatter(CLIENT_LOG_FORMAT)
+client_console_handler.setFormatter(client_console_formatter)
 client_logger.addHandler(client_console_handler)
 
 #configure server logger
