@@ -51,7 +51,7 @@ def run_command(command, option=None):
                 else:
                     print("Invalid option")
                 #return
-        client_logger.debug(f"Recieved {command} with options {option}")
+        client_logger.debug(f"Received command {command} with options {option}")
         function(option)
     else:
         client_logger.error("Command not found")

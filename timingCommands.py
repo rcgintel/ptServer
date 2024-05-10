@@ -188,6 +188,7 @@ def man(parser):
         print("report generated in location ",location)
     show_report(location)
 
+@log_performance
 def load_corner(corner):
     if corner == "--help":
         print("give the corner for which you need the timing numbers")
@@ -197,6 +198,7 @@ def load_corner(corner):
     globalVariable.corner = corner
     return corner
 
+@log_performance
 def show_corner(option=None):
     print("The available corners are ")
     config = configparser.ConfigParser()
@@ -206,10 +208,11 @@ def show_corner(option=None):
     for cor in machineSetup.split("\n"):
         print(cor.split(":")[0])
 
+@log_performance
 def current_corner(option=None):
     print("The current corners is: "+globalVariable.corner)
    
-
+@log_performance
 def show_report(location):
     if globalVariable.displayResult:
         print("This command will print the entire report from", location)
@@ -235,6 +238,7 @@ def show_report(location):
     else:
         print("reports are not displayed run set_app_var displayResult 1 to enable displaying the reports")
 
+@log_performance
 def set_app_var(option):
     print(option)
     appName = option.split(" ")[0]
@@ -243,7 +247,7 @@ def set_app_var(option):
     print(globalVariable.displayResult)
     #code.interact(local=locals())
 
-
+@log_performance
 def set_user_location(location):
     path_to_check = location
     if check_permissions(path_to_check):
@@ -276,12 +280,14 @@ def show_block(option=None):
 def current_block(option=None):
     print("[bold green]the current block name is : [/bold green]", globalVariable.blockName)
 
+@log_performance
 def show_info(option=None):
     print("[bold green]Project : [/bold green]", globalVariable.project)
     print("[bold green]block name : [/bold green]", globalVariable.blockName)
     print("[bold green]work week : [/bold green]", globalVariable.runName)
     print("[bold green]corner : [/bold green]", globalVariable.corner)
 
+@log_performance
 def history(option=None):
     print("[bold green]Command History : [/bold green]")
     commandNumber = 0
@@ -391,7 +397,7 @@ def extractPathInfo(fileName):
 
 
 
-
+@log_performance
 def copy_file(source_file, destination_file):
     try:
         shutil.copy(source_file, destination_file)
@@ -402,6 +408,7 @@ def copy_file(source_file, destination_file):
         print("Permission denied.")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 def check_permissions(path):
     # Check if the path exists
