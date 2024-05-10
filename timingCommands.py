@@ -33,7 +33,7 @@ def get_cells (parser):
         print("report generated in location ",location)
         globalVariable.tempLocation = location
         cmdCompletionTime = datetime.datetime.now()
-        client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds}")
+        client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds()}")
     show_report(location)
 
 def get_pins (parser):
