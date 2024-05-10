@@ -1,4 +1,4 @@
-#! /usr/intel/bin/python3.11.1 
+#! /usr/intel/bin/python3.10.8
 
 import sys
 
@@ -10,9 +10,9 @@ import sqlite3
 from optparse import OptionParser
 from csv import reader
 import re
-sys.path.append('/nfs/site/disks/vmisd_vclp_efficiency/rcg/scripts/versionControl/python/ptServerCLI')
 import json
 from ptServerDatabasemysql import *
+import code
 
 parser = OptionParser()
 
@@ -46,9 +46,12 @@ flag = True
 while flag:
     conn = connectMySql()
     cursor = conn.cursor(dictionary=True)
+    #SET SQL_SAFE_UPDATES = 0;
     try:
+        cursor.execute("SET SQL_SAFE_UPDATES = 0;")
         cursor.execute(options.cmd)
         records = cursor.fetchall()
+        #code.interact(local=locals())
         if records:
             #if records[0]['variableValue']:
             if 'records' in locals() and records and isinstance(records, list) and records[0] and 'variableValue' in records[0]:

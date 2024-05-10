@@ -15,7 +15,8 @@ import time
 ### this script will spawn the pt server machine
 def background_task(interval_sec):
     # run forever
-    while True:
+    flag = True
+    while flag:
         # block for the interval
         time.sleep(interval_sec)
         #print(globalVariable.runName)
@@ -44,11 +45,43 @@ def background_task(interval_sec):
         # perform the task
         #code.interact(local=locals())
         print('Background task!')
+        #flag = False
+
+def machineSpawn_task(interval_sec):
+    # run forever
+    while True:
+        # block for the interval
+        time.sleep(interval_sec)
+        #print(globalVariable.runName)
+        for t in getAllAvailbeMachine():
+            print(t['machineId'],t['heartBeat'])
+            if t['heartBeat'] > 10:
+                print("machine on machineID :",t["machineId"]," will be marked killed")
+                setMachineKilledInMachineTrackerTable(t['machineName'],t['workWeek'],t['projectName'])
+                env = config[project]["gtEnv"]
+                wash = config[project]["wash"]
+                target = config[project]["target"]
+                Cores = config[project]["cores"]
+                qslot = config[project]["qslot"]
+                clas = config[project]["clas"]
+                machineMemory = config[project]["machineMemory"]
+                ptServerTcl = config[project]["ptServerTcl"]
+                cmd = "nbjob run --target "+target+" --qslot "+qslot+" --wash  --class \'"+clas+""+machineMemory+"G&&"+Cores+"C\' xterm -T \""+t["machineName"]+"\" -e \"source setup"+t['machineName']+".csh\""
+                print ("run the command ", cmd)
+                os.system(cmd)
+
+
+            else:
+                print("increment the heartbeat by 1")
+                hbeat = int(t['heartBeat']) + 1
+                updateMachineHeartbeat(t['machineId'],hbeat)
+        # perform the task
+        #code.interact(local=locals())
+        print('SpawnBackground task!')
  
 #######################
 
 config = configparser.ConfigParser()
-
 
 parser = argparse.ArgumentParser(description="User arg1")
 parser.add_argument("-R", "--restore", action="store_true", help="Restore the project")
@@ -82,7 +115,8 @@ setupDatabase()
 ## removed the fork task
 daemon = Thread(target=background_task, args=(60,), daemon=True, name='Background')
 daemon.start()
-#background_task(60)
+#daemon = Thread(target=machineSpawn_task, args=(60,), daemon=True, name='SpawnBackground')
+#daemon.start()
 
 if not args.restore:
     for cornerMachine in machineSetup.split("\n"):
@@ -102,7 +136,7 @@ if not args.restore:
             ex_file = open("./setup"+corner+"_"+str(cornerName)+".csh","w")
             ex_file2 = open("./ptRun"+corner+"_"+str(cornerName)+".tcl","w")
             ex_file.write(env)
-            data = "\n\npt_shell -file ./ptRun"+corner+"_"+str(cornerName)+".tcl"
+            data = "\n\npt_shell -file ./ptRun"+corner+"_"+str(cornerName)+".tcl -output_log_file ptServer_"+corner+"_"+str(cornerName)+".log"
             ex_file.write(data)
             data = "set database \""+config[project]["database"]+"\"\n"
             ex_file2.write(data)
@@ -131,8 +165,8 @@ if not args.restore:
                 #machineTrackerTable = ["machineId","machineName","corner","status","load","commandId","workWeek"]
                 machineName = corner+"_"+str(cornerName)
                 
-                load = ""
-                commandId = ""
+                load = 0
+                commandId = 0
                 workWeek = runName
                 projectName = project
                 mySql = (machineName,corner,status,load,commandId,workWeek,projectName,blockName)
@@ -155,17 +189,11 @@ while (flag):
             do nothing
     """
     ## get the database
-    #database = config[project]["database"]
     #code.interact(local=locals())
     notServiced = getAllNotServicedJobs()
     #code.interact(local=locals())
     for job in notServiced:
         #code.interact(local=locals())
-        #job = str(job)
-        #job = job.replace("{", "")
-        #job = job.replace("}", "")
-        #job = job.replace("'", "")
-        #commandId = job.split(",")[0].split(":")[1].lstrip()
         commandId = job['commandId']
         jobCorner = job['corner']
         #print("jobs not serviced ", job)
@@ -178,9 +206,6 @@ while (flag):
             machine = machine.replace("{", "")
             machine = machine.replace("}", "")
             machine = machine.replace("'", "")
-            #machine = str(machine[0]).replace("{", "")
-            #machine = machine.replace("}", "")
-            #machine = machine.replace("'", "")
             if len(machine) > 0:
                 machineName = machine.split(",")[1].split(":")[1].lstrip()
                 updateMachineNameInCommandInputTable(machineName,commandId)
