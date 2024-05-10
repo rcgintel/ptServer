@@ -45,7 +45,7 @@ def get_server_logger():
     Use server_logger.debug(message) to log message to log files
     Use server_logger.info(message) to log messager to console as well as log files
     """
-    if 'server_logger' not in logging.Logger.manager.loggerDict
+    if 'server_logger' not in logging.Logger.manager.loggerDict:
 
         SERVER_LOG_FORMAT = "%(levelname)s     :%(asctime)s %(message)s"
         SERVER_LOG_LEVEL = logging.DEBUG #for all data to be writen to log
