@@ -1,5 +1,2 @@
 show_work_week
-set_user_location /nfs/site/disks/elg_g31_a0_axfe_rctie_05/rcg/runs/test/
-load_work_week WW4p4
-load_corner sifunctional_typ_0p85v_85c_typical_CCworst_85C_max
 report_timing -nosplit

@@ -242,11 +242,32 @@ def show_report(location):
 def set_app_var(option):
     print(option)
     appName = option.split(" ")[0]
-    appValue = int(option.split(" ")[1])
-    setattr(globalVariable,appName,appValue)
-    print(globalVariable.displayResult)
+    appValue = option.split(" ")[1]
     #code.interact(local=locals())
+    if isinstance(appValue, bool):
+        appValue = bool(option.split(" ")[1])
+    elif isinstance(appValue, int):
+        appValue = int(option.split(" ")[1])
+    elif isinstance(appValue, float):
+        appValue = float(option.split(" ")[1])
+    elif isinstance(appValue, str):
+        appValue = str(option.split(" ")[1])
+    setattr(globalVariable,appName,appValue)
+    print(getattr(globalVariable,appName))
 
+
+def get_app_var(option):
+    print(option)
+    print(getattr(globalVariable,option))
+    #code.interact(local=locals())
+    return(getattr(globalVariable,option))
+
+@log_performance
+def list_app_var(option=None):
+    visibleVar = ["displayResult","historyLimit","tempLocation","userLocation"]
+    for visVar in visibleVar:
+        print(visVar," : ",getattr(globalVariable,visVar))
+        
 @log_performance
 def set_user_location(location):
     path_to_check = location
@@ -258,6 +279,7 @@ def set_user_location(location):
 
 def get_user_location(location):
     print("[bold green]defined the user reports location : [/bold green]", globalVariable.userLocation)
+    return(globalVariable.userLocation)
 
 def load_work_week(workweek):
     globalVariable.runName = workweek
@@ -268,7 +290,6 @@ def show_work_week(option=None):
 
 def current_work_week(option=None):
     print("[bold green]the current workweek : [/bold green]", globalVariable.runName)
-
 
 def load_block(blockName):
     globalVariable.blockName = blockName
@@ -289,6 +310,7 @@ def show_info(option=None):
 
 @log_performance
 def history(option=None):
+    print("[bold green] current history length [/bold green]", globalVariable.historyLimit)
     print("[bold green]Command History : [/bold green]")
     commandNumber = 0
     #code.interact(local=locals())
