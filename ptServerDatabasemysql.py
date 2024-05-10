@@ -97,7 +97,7 @@ def setupDatabase():
         complete INT default -1,
         outputLocation TEXT,
         workWeek varchar(30) NOT NULL,
-        sectionTop varchar(30) NOT NULL,
+        sectionTop varchar(30) default " ",
         blockName varchar(30) NOT NULL,
         projectName varchar(30) NOT NULL,
         runTime INT
@@ -111,7 +111,7 @@ def setupDatabase():
         loads INT DEFAULT  0,
         commandId INT DEFAULT 0,
         workWeek varchar(20) NOT NULL,
-        sectionTop varchar(30) ,
+        sectionTop varchar(30) default " ",
         blockName varchar(30) NOT NULL,
         projectName varchar(30) NOT NULL,
         heartBeat INT DEFAULT 0,
@@ -146,7 +146,7 @@ def setupDatabase():
         slack TEXT NOT NULL,
         corner TEXT NOT NULL,
         workWeek TEXT NOT NULL,
-        sectionTop TEXT NOT NULL,
+        sectionTop TEXT default " ",
         nameOfBlock TEXT NOT NULL,
         projectName TEXT NOT NULL
     );
