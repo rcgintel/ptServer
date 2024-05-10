@@ -14,9 +14,20 @@ import readline
 import globalVariable
 import datetime
 import re
+import logging
+from log_config import get_client_logger
+
+##setup logging
+log_banner = """
+************************************
+            PT SERVER CLI
+************************************
+"""
 
 # Define a dictionary to store the commands and their options
 commands = {}
+client_logger = get_client_logger()
+
 
 # Function to add a new command
 def add_command(command_name, function, options=[], helpM=""):
@@ -40,9 +51,10 @@ def run_command(command, option=None):
                 else:
                     print("Invalid option")
                 #return
+        client_logger.debug(f"Received command {command} with options {option}")
         function(option)
     else:
-        print("Command not found")
+        client_logger.error("Command not found")
 
 
 
@@ -54,6 +66,8 @@ def start_gui(option=None):
     import queue
 
     globalVariable.guiMode = 1
+    client_logger.debug("Started GUI Mode")
+
     class TerminalApp:
         def change_button_color(self, event, idx, buttons):
             button = event.widget
@@ -64,6 +78,7 @@ def start_gui(option=None):
         def destroyMaster(self):
             globalVariable.guiMode = 0
             self.master.destroy()
+            client_logger.debug("GUI closed")
         
         def generateOutput(self, event):
             print(self.entry_widget.get())
@@ -143,7 +158,7 @@ def start_gui(option=None):
     root.mainloop()
 
 
-    print("starting the gui for ptServer")
+    client_logger.info("Starting GUI for ptServer")
 
 
 
@@ -206,6 +221,10 @@ if __name__ == "__main__":
     console = Console()
     version = 1.0
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
+
+    client_logger.debug(log_banner)
+    client_logger.debug("PTSERVER CLI INITIAITED AT %s by %s",os.getcwd(),os.environ.get("USER"))
+
     ## show block ; show work week ; show corner
     command = "show_block"
     option = ""
@@ -221,6 +240,12 @@ if __name__ == "__main__":
     globalVariable.userLocation = input("give the location to dump the reports: ")
     globalVariable.project = os.environ.get('PROJ_NAME')
 
+    client_logger.debug(f" Current project: {globalVariable.project}")
+    client_logger.debug(f" Current blockName: {globalVariable.blockName}")
+    client_logger.debug(f" Current runName: {globalVariable.runName}")
+    client_logger.debug(f" Current corner: {globalVariable.corner}")
+    client_logger.debug(f" Current userLocation: {globalVariable.userLocation}")
+    
 
     while True:
         current_time = datetime.datetime.now()
@@ -231,12 +256,14 @@ if __name__ == "__main__":
             print("enter command")
             continue
         if user_input.lower() == "exit":
-            print ("exiting PTServer\nThanks for using PTServer")
+            client_logger.info("exiting PTServer\nThanks for using PTServer")
             break
         if user_input.lower().startswith("source"):
             match = re.match(r"source\s*(.*)", user_input)
             fileSource = match.group(1)
-            print(fileSource)
+
+            client_logger.info(f"Sourcing file {fileSource}")
+
             try:
                 with open(fileSource, 'r') as file:
                     for line in file:
@@ -248,9 +275,9 @@ if __name__ == "__main__":
                         print("option: ",option)
                         run_command(command, option)
             except FileNotFoundError:
-                print("The file does not exist.")
+                client_logger.error(f"The file{fileSource} does not exist")
             except Exception as e:
-                print("An error occurred:", e)
+                client_logger.error(f"An error has occured while sourcing {fileSource}")
 
         else:
             parts = user_input.split()

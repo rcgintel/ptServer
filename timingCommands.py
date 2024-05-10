@@ -6,6 +6,20 @@ import shutil
 import datetime
 import re
 
+from log_config import get_client_logger
+
+client_logger = get_client_logger()
+
+def log_performance(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        client_logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+        return result
+    return wrapper
+
+@log_performance
 def get_cells (parser):
     print("get_cells cells ",globalVariable.corner)
     if parser == None:
@@ -13,14 +27,16 @@ def get_cells (parser):
     else:
         command = "get_cells "+ parser
     commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
+
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
+@log_performance
 def get_pins (parser):
     print("get_pins of cells ",globalVariable.corner)
     if parser == None:
@@ -28,44 +44,50 @@ def get_pins (parser):
     else:
         command = "get_pins "+ parser
     commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
+@log_performance
 def get_lib_cells (parser):
     print("get_lib_cells of cells ",globalVariable.corner)
     if parser == None:
         command = "get_lib_cells "
     else:
         command = "get_lib_cells "+ parser
+
     commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
+@log_performance
 def get_lib_pins (parser):
     print("get_lib_pins of cells ",globalVariable.corner)
     if parser == None:
         command = "get_lib_pins "
     else:
         command = "get_lib_pins "+ parser
+
     commandId = writeToCommandInputTable(command)
+       
     print("please wait for the command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
+@log_performance
 def get_object_name (parser):
     print("get_object_name -of cells ",globalVariable.corner)
     if parser == None:
@@ -73,15 +95,15 @@ def get_object_name (parser):
     else:
         command = "get_object_name "+ parser
     commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
-
+@log_performance
 def get_attributes (parser):
     print("get_attributes -of ",globalVariable.corner)
     if parser == None:
@@ -89,91 +111,68 @@ def get_attributes (parser):
     else:
         command = "get_attributes "+ parser
     commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
 
+@log_performance
 def report_timing(parser):
     print("currner corner for generating timing report ",globalVariable.corner)
     if parser == None:
         command = "report_timing "
     else:
         command = "report_timing "+ parser
-    databaseWriteStart = datetime.datetime.now()
+
     commandId = writeToCommandInputTable(command)
-    databaseWriteEnd = datetime.datetime.now()
-    databaseWriteTime = databaseWriteEnd - databaseWriteStart
-    formatted_time = databaseWriteTime.total_seconds()
-    print("please wait for the command to be serviced : ",formatted_time)
+    client_logger.info("Please wait for command to be serviced")
     #code.interact(local=locals())
     location = None
     completCommandStart = datetime.datetime.now()
     while location == None:
         print("time: ",datetime.datetime.now())
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
-    completCommandEnd = datetime.datetime.now()
-    completCommandTime = completCommandEnd - completCommandStart
-    formatted_time = completCommandTime.total_seconds()
-    print("time taken to execute command in pt : ",formatted_time)
     show_report(location)
-    showReportEnd = datetime.datetime.now()
-    completCommandTime = showReportEnd - completCommandEnd
-    formatted_time = completCommandTime.total_seconds()
-    print("time taken to print file : ",formatted_time)
     return(commandId)
 
 
 
-
+@log_performance
 def report_delay_calculation(parser):
-    print("currner corner for generating timing report ",globalVariable.corner)
+    print("current corner for generating timing report ",globalVariable.corner)
     if parser == None:
         print ("incorrect options")
         command = "report_delay_calculation "
     else : 
         command = "report_delay_calculation "+ parser
-    databaseWriteStart = datetime.datetime.now()
+
     commandId = writeToCommandInputTable(command)
-    databaseWriteEnd = datetime.datetime.now()
-    databaseWriteTime = databaseWriteEnd - databaseWriteStart
-    formatted_time = databaseWriteTime.total_seconds()
-    print("please wait for the command to be serviced : ",formatted_time)
-    #code.interact(local=locals())
+    client_logger.info("Please wait for command to be serviced")
     location = None
-    completCommandStart = datetime.datetime.now()
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
+        client_logger.info(f"Report generated in location {location}")
         globalVariable.tempLocation = location
-    completCommandEnd = datetime.datetime.now()
-    completCommandTime = completCommandEnd - completCommandStart
-    formatted_time = completCommandTime.total_seconds()
-    print("time taken to execute command in pt : ",formatted_time)
     show_report(location)
-    showReportEnd = datetime.datetime.now()
-    completCommandTime = showReportEnd - completCommandEnd
-    formatted_time = completCommandTime.total_seconds()
-    print("time taken to print file : ",formatted_time)
 
+@log_performance
 def set_var(parser):
     print("set variable ",globalVariable.corner)
     command = "set "+ parser
-    #code.interact(local=locals())
     variableName = parser.split(" ")[0]
     user = os.environ['USER']
     variableValue = command
     commandId = writeToCommandInputTable(command)
     mySql = (variableName,user,variableValue)
     writeToUserVariablesTable(mySql)
-    print("please wait for the command to be serviced")
+    client_logger.info("Please wait for command to be serviced")
     location = getCompleteFromCommandInputTable(commandId)
-    print("report generated in location ",location)
+    client_logger.info(f"Report generated in location {location}")
     show_report(location)
 
 def man(parser):
@@ -189,6 +188,7 @@ def man(parser):
         print("report generated in location ",location)
     show_report(location)
 
+@log_performance
 def load_corner(corner):
     if corner == "--help":
         print("give the corner for which you need the timing numbers")
@@ -198,6 +198,7 @@ def load_corner(corner):
     globalVariable.corner = corner
     return corner
 
+@log_performance
 def show_corner(option=None):
     print("The available corners are ")
     config = configparser.ConfigParser()
@@ -207,10 +208,11 @@ def show_corner(option=None):
     for cor in machineSetup.split("\n"):
         print(cor.split(":")[0])
 
+@log_performance
 def current_corner(option=None):
     print("The current corners is: "+globalVariable.corner)
    
-
+@log_performance
 def show_report(location):
     if globalVariable.displayResult:
         print("This command will print the entire report from", location)
@@ -236,6 +238,7 @@ def show_report(location):
     else:
         print("reports are not displayed run set_app_var displayResult 1 to enable displaying the reports")
 
+@log_performance
 def set_app_var(option):
     print(option)
     appName = option.split(" ")[0]
@@ -259,11 +262,13 @@ def get_app_var(option):
     #code.interact(local=locals())
     return(getattr(globalVariable,option))
 
+@log_performance
 def list_app_var(option=None):
     visibleVar = ["displayResult","historyLimit","tempLocation","userLocation"]
     for visVar in visibleVar:
         print(visVar," : ",getattr(globalVariable,visVar))
-
+        
+@log_performance
 def set_user_location(location):
     path_to_check = location
     if check_permissions(path_to_check):
@@ -296,12 +301,14 @@ def show_block(option=None):
 def current_block(option=None):
     print("[bold green]the current block name is : [/bold green]", globalVariable.blockName)
 
+@log_performance
 def show_info(option=None):
     print("[bold green]Project : [/bold green]", globalVariable.project)
     print("[bold green]block name : [/bold green]", globalVariable.blockName)
     print("[bold green]work week : [/bold green]", globalVariable.runName)
     print("[bold green]corner : [/bold green]", globalVariable.corner)
 
+@log_performance
 def history(option=None):
     print("[bold green] current history length [/bold green]", globalVariable.historyLimit)
     print("[bold green]Command History : [/bold green]")
@@ -412,7 +419,7 @@ def extractPathInfo(fileName):
 
 
 
-
+@log_performance
 def copy_file(source_file, destination_file):
     try:
         shutil.copy(source_file, destination_file)
@@ -423,6 +430,7 @@ def copy_file(source_file, destination_file):
         print("Permission denied.")
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 def check_permissions(path):
     # Check if the path exists
