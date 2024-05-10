@@ -170,7 +170,7 @@ def set_var(parser):
     commandId = writeToCommandInputTable(command)
     mySql = (variableName,user,variableValue)
     writeToUserVariablesTable(mySql)
-    client_logger.info("Please wait for command to be serviced"))
+    client_logger.info("Please wait for command to be serviced")
     location = getCompleteFromCommandInputTable(commandId)
     client_logger.info(f"Report generated in location {location}")
     show_report(location)
