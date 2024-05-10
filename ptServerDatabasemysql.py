@@ -22,8 +22,19 @@ def connectMySql():
         "user": "rcg_ptServer",
         "password": "PTServer123",
         "database": "rcg",
+        "sql_mode":"TRADITIONAL",
         "tls_versions": ["TLSv1.2", "TLSv1.1"]
     }
+    #connection_config = {
+    #    "host": "maria4598-lb-fm-in.dbaas.intel.com",
+    #    "port": 3306,
+    #    "user": "rcg_ptServer",
+    #    "password": "PTServer123",
+    #    "database": "rcg",
+    #    "sql_mode":"TRADITIONAL",
+    #    "tls_versions": ["TLSv1.2", "TLSv1.1"]
+    #}
+
     connection = mysql.connector.connect(**connection_config)
     return connection
 
@@ -78,13 +89,13 @@ def setupDatabase():
         machineName varchar(200) NOT NULL,
         corner varchar(100) NOT NULL,
         status varchar(20) NOT NULL,
-        loads INT,
-        commandId INT,
+        loads INT DEFAULT  0,
+        commandId INT DEFAULT 0,
         workWeek varchar(20) NOT NULL,
-        sectionTop varchar(30) NOT NULL,
+        sectionTop varchar(30) ,
         blockName varchar(30) NOT NULL,
         projectName varchar(30) NOT NULL,
-        heartBeat INT NOT NULL,
+        heartBeat INT DEFAULT 0,
         totalRunTime INT
     );
 
@@ -232,7 +243,7 @@ def getCompleteFromCommandInputTable(commandId):
     config.read(globalVariable.configFile)
     databaseLocation = config[project]["database"]
     #conn = sqlite3.connect(databaseLocation)
-    
+
     flag = 0
     #code.interact(local=locals())
     #sqlcmd = "select complete from "+globalDatabaseName+".commandInputTable where commandId = \'"+str(commandId)+"\';"
@@ -255,7 +266,6 @@ def getCompleteFromCommandInputTable(commandId):
         flag = cursor.fetchone()[0]
         conn.commit()
         #print("Command in wait state and flag is : ", flag)
-        
     #conn.close()
     #conn = connectMySql()
     #cursor = conn.cursor()
