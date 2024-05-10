@@ -10,23 +10,70 @@ from log_config import get_client_logger
 
 client_logger = get_client_logger()
 
+def log_performance(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        client_logger.info(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+        return result
+    return wrapper
 
+@log_performance
 def get_cells (parser):
     print("get_cells cells ",globalVariable.corner)
     if parser == None:
         command = "get_cells "
     else:
         command = "get_cells "+ parser
+    commandId = writeToCommandInputTable(command)
+    client_logger.info("Please wait for command to be serviced")
 
-    
+    location = None
+    while location == None:
+        location = getCompleteFromCommandInputTable(commandId)
+        print("report generated in location ",location)
+        globalVariable.tempLocation = location
+    show_report(location)
+
+def get_pins (parser):
+    print("get_pins of cells ",globalVariable.corner)
+    if parser == None:
+        command = "get_pins "
+    else:
+        command = "get_pins "+ parser
+
     client_logger.debug("Writing to CommandInputTable")
     databaseWriteStart = datetime.datetime.now()
-
     commandId = writeToCommandInputTable(command)
-
     databaseWriteEnd = datetime.datetime.now()
     client_logger.debug(f"Write completed. Time: {(databaseWriteEnd -  databaseWriteStart).total_seconds()}")
-    print("please wait for the command to be serviced")
+
+    client_logger.info("Please wait for command to be serviced")
+    location = None
+    while location == None:
+        location = getCompleteFromCommandInputTable(commandId)
+        print("report generated in location ",location)
+        globalVariable.tempLocation = location
+
+        cmdCompletionTime = datetime.datetime.now()
+        client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds()}")
+    show_report(location)
+
+def get_lib_cells (parser):
+    print("get_lib_cells of cells ",globalVariable.corner)
+    if parser == None:
+        command = "get_lib_cells "
+    else:
+        command = "get_lib_cells "+ parser
+
+    client_logger.debug("Writing to CommandInputTable")
+    databaseWriteStart = datetime.datetime.now()
+    commandId = writeToCommandInputTable(command)
+    databaseWriteEnd = datetime.datetime.now()
+    client_logger.debug(f"Write completed. Time: {(databaseWriteEnd -  databaseWriteStart).total_seconds()}")
+
+    client_logger.info("Please wait for command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
@@ -36,49 +83,27 @@ def get_cells (parser):
         client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds()}")
     show_report(location)
 
-def get_pins (parser):
-    print("get_pins of cells ",globalVariable.corner)
-    if parser == None:
-        command = "get_pins "
-    else:
-        command = "get_pins "+ parser
-    commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
-    location = None
-    while location == None:
-        location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
-        globalVariable.tempLocation = location
-    show_report(location)
-
-def get_lib_cells (parser):
-    print("get_lib_cells of cells ",globalVariable.corner)
-    if parser == None:
-        command = "get_lib_cells "
-    else:
-        command = "get_lib_cells "+ parser
-    commandId = writeToCommandInputTable(command)
-    print("please wait for the command to be serviced")
-    location = None
-    while location == None:
-        location = getCompleteFromCommandInputTable(commandId)
-        print("report generated in location ",location)
-        globalVariable.tempLocation = location
-    show_report(location)
-
 def get_lib_pins (parser):
     print("get_lib_pins of cells ",globalVariable.corner)
     if parser == None:
         command = "get_lib_pins "
     else:
         command = "get_lib_pins "+ parser
+
+    client_logger.debug("Writing to CommandInputTable")
+    databaseWriteStart = datetime.datetime.now()
     commandId = writeToCommandInputTable(command)
+    databaseWriteEnd = datetime.datetime.now()
+    client_logger.debug(f"Write completed. Time: {(databaseWriteEnd -  databaseWriteStart).total_seconds()}")
+       
     print("please wait for the command to be serviced")
     location = None
     while location == None:
         location = getCompleteFromCommandInputTable(commandId)
         print("report generated in location ",location)
         globalVariable.tempLocation = location
+        cmdCompletionTime = datetime.datetime.now()
+        client_logger.debug(f"Command completed in {(cmdCompletionTime  - databaseWriteStart).total_seconds()}")
     show_report(location)
 
 def get_object_name (parser):
