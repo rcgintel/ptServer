@@ -11,22 +11,27 @@ import time
 from rich import print
 import mysql.connector
 import datetime
+import functools
 
 from log_config import get_client_logger, get_server_logger
 
-def log_performance(func, logger_type):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        if logger_type == "server":
-            server_logger = get_server_logger()
-            server_logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
-        elif logger_type == "client":
-            client_logger = get_client_logger()
-            client_logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
-        return result
-    return wrapper
+def log_performance(logger_type):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            if logger_type == "server":
+                logger = get_server_logger()
+            elif logger_type == "client":
+                logger = get_client_logger()
+            else:
+                raise ValueError(f"Invalid logger type: {logger_type}")
+            logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+            return result
+        return wrapper
+    return decorator
 ################### procedures
 
 def connectMySql():
@@ -155,6 +160,7 @@ def setupDatabase():
     connection = connectMySql()
     create_database(connection,cmd)
 
+@log_performance("client")
 def writeToCommandInputTable(command):
     """
     This function takes a command as argument and adds it to the CommandInputTable in the database. 
@@ -185,10 +191,11 @@ def writeToCommandInputTable(command):
     conn.close()
     return id
 
+@log_performance("server")
 def writeToMachineTrackerTable(dataSql):
     """
     Function stores data about all initiated machines in the database.
-    Used by  pythonServerMachineSpawn.py to inititialize ptShells
+    Used by  ptServerMachineSpawn.py to inititialize ptShells
     """
     corner = globalVariable.corner
     user = os.environ['USER']
@@ -205,7 +212,8 @@ def writeToMachineTrackerTable(dataSql):
     cursor.execute(sql, dataSql)
     conn.commit()
     conn.close()
-    
+
+@log_performance("client")   
 def writeToUserVariablesTable(dataSql):
     """
     Function writes to the UserVariablesTable.
@@ -228,6 +236,7 @@ def writeToUserVariablesTable(dataSql):
     conn.commit()
     conn.close()
 
+@log_performance("client")
 def writeTocompareInputTable(dataSql,returnlastrow = False):
     """
     Writes data initially to the Compare Input table for compare_timing command.
@@ -246,6 +255,7 @@ def writeTocompareInputTable(dataSql,returnlastrow = False):
     if returnlastrow:
         return id
 
+@log_performance("client")
 def getCompleteFromCommandInputTable(commandId):
     """
     Checks if command whose commandId is passed as argument is serviced yet. Returns location of report when services. waits for 2 seconds and repolls if not serviced
@@ -292,7 +302,6 @@ def getCompleteFromCommandInputTable(commandId):
     cursor.close()
     conn.close()
     return location
-
 
 
 def get_values_from_database(database, table, columns, condition=""):
@@ -349,7 +358,7 @@ def update_field_in_database(database, table, column_to_update, new_value, condi
             connection.close()  # Close the database connection
 
 
-
+@log_performance("client")
 def getAllWorkWeek():
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -364,7 +373,7 @@ def getAllWorkWeek():
     return unique_work_weeks
 
 
-
+@log_performance("client")
 def getAllblockName():
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -378,6 +387,7 @@ def getAllblockName():
     unique_block_name = sorted({row['blockName'] for row in sqlOutput})
     return unique_block_name
 
+@log_performance("server")
 def getAllNotServicedJobs():
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -391,6 +401,7 @@ def getAllNotServicedJobs():
 
 #machineTrackerTable = ["machineId","machineName","corner","status","loads","commandId","workWeek"]
 
+@log_performance("server")
 def getAllAvailbeMachineForCorner(corner):
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -404,7 +415,7 @@ def getAllAvailbeMachineForCorner(corner):
     sqlOutput = get_values_from_database(databaseLocation,table,column,condition)
     return sqlOutput
 
-
+@log_performance("server")
 def getAllAvailbeMachine():
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -420,7 +431,7 @@ def getAllAvailbeMachine():
     return sqlOutput
 
 
-
+@log_performance("server")
 def updateMachineHeartbeat(machineId, hbeat):
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -437,6 +448,7 @@ def updateMachineHeartbeat(machineId, hbeat):
 
 #commandInputTable = ["commandId","command","user","corner","machineName","serviced","complete","outputLocation","workWeek"]
 
+@log_performance("server")
 def updateMachineNameInCommandInputTable(machineName,commandId):
     config = configparser.ConfigParser()
     project = globalVariable.project
@@ -450,6 +462,7 @@ def updateMachineNameInCommandInputTable(machineName,commandId):
     #code.interact(local=locals())
     update_field_in_database(databaseLocation, table, column_to_update, new_value, condition)
 
+@log_performance("server")
 def setMachineKilledInMachineTrackerTable(machineName,workWeek,project):
     config = configparser.ConfigParser()
     #project = globalVariable.project
