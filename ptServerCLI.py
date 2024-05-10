@@ -15,7 +15,7 @@ import globalVariable
 import datetime
 import re
 import logging
-from log_config import client_logger
+from log_config import get_client_logger
 
 ##setup logging
 log_banner = """
@@ -26,7 +26,7 @@ log_banner = """
 
 # Define a dictionary to store the commands and their options
 commands = {}
-
+client_logger = get_client_logger()
 
 
 # Function to add a new command

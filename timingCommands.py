@@ -6,7 +6,9 @@ import shutil
 import datetime
 import re
 
-from log_config import client_logger
+from log_config import get_client_logger
+
+client_logger = get_client_logger()
 
 
 def get_cells (parser):
