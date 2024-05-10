@@ -12,7 +12,21 @@ from rich import print
 import mysql.connector
 import datetime
 
+from log_config import get_client_logger, get_server_logger
 
+def log_performance(func, logger_type):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        if logger_type == "server":
+            server_logger = get_server_logger()
+            server_logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+        elif logger_type == "client":
+            client_logger = get_client_logger()
+            client_logger.debug(f"{func.__name__} executed in {end_time - start_time:.4f} seconds")
+        return result
+    return wrapper
 ################### procedures
 
 def connectMySql():
