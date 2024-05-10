@@ -17,6 +17,16 @@ import re
 import logging
 from log_config import get_client_logger
 
+
+def checkLicense():
+    expiry_date = datetime.datetime(2024, 6, 30)
+    current_date = datetime.datetime.now()
+    if current_date > expiry_date:
+        print("Time expired please expect next version code for implementation")
+        os.exit()
+    else:
+        print("Valid code")
+
 ##setup logging
 log_banner = """
 ************************************
@@ -202,6 +212,7 @@ add_command("get_app_var",get_app_var)
 
 
 add_command("compare_timing",compare_timing, "command workWeeks corners","")
+checkLicense()
 
 # Define a function to handle tab completion
 def completer(text, state):

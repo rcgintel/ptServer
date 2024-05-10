@@ -11,8 +11,18 @@ from rich import print
 import json
 from threading import Thread
 import time
+import datetime
 
 from log_config import get_server_logger
+
+def checkLicense():
+    expiry_date = datetime.datetime(2024, 6, 30)
+    current_date = datetime.datetime.now()
+    if current_date > expiry_date:
+        print("Time expired please expect next version code for implementation")
+        os.exit()
+    else:
+        print("Valid code")
 
 server_logger = get_server_logger()
 log_banner = """
@@ -32,7 +42,7 @@ def background_task(interval_sec):
         for t in getAllAvailbeMachine():
             server_logger.info(f" Background Task : MachineID: {t['machineId']}, Heartbeat: {t['heartBeat']}")
             if t['heartBeat'] > 10:
-                server_logger.warning("Background Task : machine on machineID :",t["machineId"]," will be marked killed")
+                server_logger.warning("Background Task : machine on machineID :"+t["machineId"]+" will be marked killed")
                 setMachineKilledInMachineTrackerTable(t['machineName'],t['workWeek'],t['projectName'])
                 env = config[project]["gtEnv"]
                 wash = config[project]["wash"]
@@ -99,6 +109,7 @@ globalVariable.project = os.environ.get("PROJ_NAME")
 project = globalVariable.project
 #else:
 #    project = args.project
+checkLicense()
 
 if args.blockName == "nil":
     blockName = globalVariable.blockName
@@ -133,7 +144,7 @@ if not args.restore:
     server_logger.info("NOT A RESTORE SESSION. STARTING NEW PT SHELLS")
     server_logger.info("Invoking PT Shells")
     for cornerMachine in machineSetup.split("\n"):
-        server_logger.info("the number of machines that we need for corner ",cornerMachine.split(":")[0]," is ",cornerMachine.split(":")[1])
+        server_logger.info("the number of machines that we need for corner "+cornerMachine.split(":")[0]+" is "+cornerMachine.split(":")[1])
         for cornerName in range(int(cornerMachine.split(":")[1])):
             corner = cornerMachine.split(":")[0]
             env = config[project]["gtEnv"]
@@ -175,7 +186,7 @@ if not args.restore:
                 status = "ready"
             else:
                 status = "loading"
-                server_logger.info("Running command : ",cmd)
+                server_logger.info("Running command : "+cmd)
                 try:
                     os.system(cmd)
                 except Exception as e:

@@ -330,8 +330,10 @@ def get_values_from_database(database, table, columns, condition=""):
         print("Error retrieving values from database:", e)
         return None
     finally:
-        if connection:
-            connection.close()  # Close the database connection
+        if connection in globals() or connection in locals():
+            if connection:
+                connection.close()  # Close the database connection
+
 
 
 
