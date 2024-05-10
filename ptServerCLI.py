@@ -197,6 +197,8 @@ add_command("current_block",current_block)
 add_command("show_info",show_info)
 add_command("history",history)
 add_command("set_app_var",set_app_var)
+add_command("list_app_var",list_app_var)
+add_command("get_app_var",get_app_var)
 
 
 add_command("compare_timing",compare_timing, "command workWeeks corners","")
