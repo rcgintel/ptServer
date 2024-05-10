@@ -50,10 +50,6 @@ def background_task(interval_sec):
                 server_logger.info("Background Task: incrementing heartbeat of MachineID {t[machineId]} by 1")
                 hbeat = int(t['heartBeat']) + 1
                 updateMachineHeartbeat(t['machineId'],hbeat)
-        # perform the task
-        #code.interact(local=locals())
-        print('Background task!')
-        #flag = False
 
 def machineSpawn_task(interval_sec):
     # run forever
@@ -179,7 +175,7 @@ if not args.restore:
                 status = "ready"
             else:
                 status = "loading"
-                print("Running command : ",cmd)
+                server_logger.info("Running command : ",cmd)
                 try:
                     os.system(cmd)
                 except Exception as e:
@@ -195,7 +191,7 @@ if not args.restore:
                 workWeek = runName
                 projectName = project
                 mySql = (machineName,corner,status,load,commandId,workWeek,projectName,blockName)
-                print(mySql,":: rcg")
+                #print(mySql,":: rcg")
                 writeToMachineTrackerTable(mySql)
                 
     server_logger.info("Invoked all PT Shells")
