@@ -35,24 +35,24 @@ def log_performance(logger_type):
 ################### procedures
 
 def connectMySql():
-    connection_config = {
-        "host": "maria3119-lb-ba-in.dbaas.intel.com",
-        "port": 3307,
-        "user": "rcg_ptServer",
-        "password": "PTServer123",
-        "database": "rcg",
-        "sql_mode":"TRADITIONAL",
-        "tls_versions": ["TLSv1.2", "TLSv1.1"]
-    }
     #connection_config = {
-    #    "host": "maria4598-lb-fm-in.dbaas.intel.com",
-    #    "port": 3306,
+    #    "host": "maria3119-lb-ba-in.dbaas.intel.com",
+    #    "port": 3307,
     #    "user": "rcg_ptServer",
     #    "password": "PTServer123",
     #    "database": "rcg",
     #    "sql_mode":"TRADITIONAL",
     #    "tls_versions": ["TLSv1.2", "TLSv1.1"]
     #}
+    connection_config = {
+        "host": "maria4598-lb-fm-in.dbaas.intel.com",
+        "port": 3306,
+        "user": "rcg_ptServer",
+        "password": "PTServer123",
+        "database": "rcg",
+        "sql_mode":"TRADITIONAL",
+        "tls_versions": ["TLSv1.2", "TLSv1.1"]
+    }
 
     connection = mysql.connector.connect(**connection_config)
     return connection
