@@ -286,7 +286,7 @@ def load_work_week(workweek):
     print("[bold green]defined the user workweek : [/bold green]", globalVariable.runName)
 
 def show_work_week(option=None):
-    print("[bold green]defined the user workweek : [/bold green]", getAllWorkWeek())
+    print("[bold green]defined the user workweek : [/bold green]", globalVariable.runName)
 
 def current_work_week(option=None):
     print("[bold green]the current workweek : [/bold green]", globalVariable.runName)
