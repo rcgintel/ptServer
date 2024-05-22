@@ -19,7 +19,7 @@ from log_config import get_client_logger
 
 
 def checkLicense():
-    expiry_date = datetime.datetime(2024, 6, 30)
+    expiry_date = datetime.datetime(2024, 9, 30)
     current_date = datetime.datetime.now()
     if current_date > expiry_date:
         print("Time expired please expect next version code for implementation")
@@ -230,7 +230,7 @@ readline.parse_and_bind("tab: complete")
 setupDatabase()
 if __name__ == "__main__":
     console = Console()
-    version = 1.0
+    version = 2.0
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
 
     client_logger.debug(log_banner)
