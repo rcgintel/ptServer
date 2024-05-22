@@ -276,7 +276,7 @@ def getCompleteFromCommandInputTable(commandId):
     cursor = conn.cursor()
     printCount = -1
     while flag != 1:
-        if printCount > 20:
+        if printCount > 10:
             print("time getCompleteFromCommandInputTable: ",datetime.datetime.now())
             printCount = 0
 
@@ -284,7 +284,7 @@ def getCompleteFromCommandInputTable(commandId):
             print("time getCompleteFromCommandInputTable: ",datetime.datetime.now())
 
         printCount += 1
-        #time.sleep(2)
+        time.sleep(1)
         #cursor.execute(sqlcmd)
         cursor.execute(sqlcmd, (commandId,))
         flag = cursor.fetchone()[0]
@@ -364,11 +364,12 @@ def update_field_in_database(database, table, column_to_update, new_value, condi
 def getAllWorkWeek():
     config = configparser.ConfigParser()
     project = globalVariable.project
+    blockName = globalVariable.blockName
     config.read(globalVariable.configFile)
     databaseLocation = config[project]["database"]
     table = "machineTrackerTable"
     column = ["workWeek"]
-    condition = " where projectName = \'"+project+"\'"
+    condition = " where projectName = \'"+project+"\' and blockName = \'"+blockName+"\' "
     sqlOutput = get_values_from_database(databaseLocation,table,column,condition)
     #code.interact(local=locals())
     unique_work_weeks = sorted({row['workWeek'] for row in sqlOutput})
@@ -383,7 +384,7 @@ def getAllblockName():
     databaseLocation = config[project]["database"]
     table = "machineTrackerTable"
     column = ["blockName"]
-    condition = " where projectName = \'"+project+"\'"
+    condition = " where projectName = \'"+project+"\' "
     sqlOutput = get_values_from_database(databaseLocation,table,column,condition)
     #code.interact(local=locals())
     unique_block_name = sorted({row['blockName'] for row in sqlOutput})

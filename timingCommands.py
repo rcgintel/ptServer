@@ -5,6 +5,8 @@ from rich import print
 import shutil
 import datetime
 import re
+from rich.console import Console
+from rich.table import Table
 
 from log_config import get_client_logger
 
@@ -121,7 +123,10 @@ def get_attributes (parser):
 
 @log_performance
 def report_timing(parser):
-    print("currner corner for generating timing report ",globalVariable.corner)
+    client_logger.debug("currner corner for generating timing report "+globalVariable.corner)
+    if "report_timing " in parser:
+        parser = re.sub(r"report_timing "," ",parser)
+
     if parser == None:
         command = "report_timing "
     else:
@@ -133,9 +138,9 @@ def report_timing(parser):
     location = None
     completCommandStart = datetime.datetime.now()
     while location == None:
-        print("time: ",datetime.datetime.now())
+        #print("time: ",datetime.datetime.now())
         location = getCompleteFromCommandInputTable(commandId)
-        client_logger.info(f"Report generated in location {location}")
+        client_logger.debug(f"Report generated in location {location}")
         globalVariable.tempLocation = location
     show_report(location)
     return(commandId)
@@ -193,14 +198,14 @@ def load_corner(corner):
     if corner == "--help":
         print("give the corner for which you need the timing numbers")
         print("use show_corner command to see the available list of corners")
-    show_corner()
-    print("changed the corner to ", corner)
+    #show_corner()
+    client_logger.info("changed the corner to "+str(corner))
     globalVariable.corner = corner
     return corner
 
 @log_performance
 def show_corner(option=None):
-    print("The available corners are ")
+    client_logger.debug("The available corners are ")
     config = configparser.ConfigParser()
     project = globalVariable.project
     config.read(globalVariable.configFile)
@@ -210,6 +215,7 @@ def show_corner(option=None):
 
 @log_performance
 def current_corner(option=None):
+    client_logger.debug("The current corners is: "+globalVariable.corner)
     print("The current corners is: "+globalVariable.corner)
    
 @log_performance
@@ -236,7 +242,7 @@ def show_report(location):
             for line in file:
                 print(line, end='')
     else:
-        print("reports are not displayed run set_app_var displayResult 1 to enable displaying the reports")
+        client_logger.debug("reports are not displayed run set_app_var displayResult 1 to enable displaying the reports")
 
 @log_performance
 def set_app_var(option):
@@ -293,6 +299,9 @@ def current_work_week(option=None):
 
 def load_block(blockName):
     globalVariable.blockName = blockName
+    show_work_week()
+    globalVariable.runName = input("give the run name: ")
+    load_work_week(globalVariable.runName)
     print("[bold green]defined the block name : [/bold green]", globalVariable.blockName)
 
 def show_block(option=None):
@@ -319,12 +328,12 @@ def history(option=None):
         commandNumber +=1
     print("[bold green] increase the history limit using set_app_var historyLimit <int> : [/bold green]")
 
-
+@log_performance
 def compare_timing(command):
     print(command)
     #code.interact(local=locals())
     pattern = r"-work_week\s+(.*?)\s+-corner\s+(.*?)-command {(.*)}"
-    import re
+
     match = re.match(pattern,command)
     if match:
         workWeeks = match.group(1)
@@ -334,36 +343,99 @@ def compare_timing(command):
             command += " -nosplit "
         if "-input_pins" not in command:
             command += " -input_pins "
-        print("this command will compare the timing between 2 runs for command ", command, " on work week ",workWeeks," and corners ",corners)
-        print("run command ",command," on work week ",workWeeks.split(":")[0]," and corner ",corners.split(":")[0])
+        if "-nets" not in command:
+            command += " -nets "
+        if "-capacitance" not in command:
+            command += " -capacitance "
+        if "-transition" not in command:
+            command += " -transition "
+        client_logger.debug("this command will compare the timing between 2 runs for command "+ command +" on work week "+ workWeeks +" and corners "+ corners)
+        #print("run command ",command," on work week ",workWeeks.split(":")[0]," and corner ",corners.split(":")[0])
         #code.interact(local=locals())
         load_work_week(workWeeks.split(":")[0])
         load_corner(corners.split(":")[0])
         command = " ".join(command.split(" ")[1:])
         commandId = report_timing(command)
-        print(globalVariable.tempLocation)
+        client_logger.debug(globalVariable.tempLocation)
         returnData = extractPathInfo(globalVariable.tempLocation)
         comparePoint = 0
+        pathCount = 0
+        printTable = []
+        #code.interact(local=locals())
+        #breakpoint()
+        console = Console()
+        #code.interact(local=locals())
+
+        client_logger.info("\n\n#################################################################")
+        #print("\n\n#################################################################")
+        #print("\nCommand Given is : "+command+"\n\n")
 
         for path in returnData:
             compareInputData = (os.environ.get("USER"),commandId,path[0],comparePoint,path[1],path[2],path[3],path[4],corners.split(":")[0],workWeeks.split(":")[0],globalVariable.blockName,globalVariable.blockName,globalVariable.project)
-            print(compareInputData)
+            #print("\nStartpoint: "+path[1]+"\nEndpoint: "+path[2]+"\n")
+            printTable.append(path[1])
+            printTable.append(path[2])
+            table = Table(show_header=True, header_style="bold magenta")
+            table.add_column("ID", style="dim", width=6)
+            table.add_column("Corner")
+            table.add_column("Slack")
+            #print(compareInputData)
+            pathCount +=1
+            table.add_row(str(pathCount), corners.split(":")[0] , path[4])
+            client_logger.debug("Path"+str(pathCount))
+            client_logger.debug("\nStartpoint: "+path[1]+"\n\nEndpoint: "+path[2]+"\n\nCorner: "+corners.split(":")[0]+"\n\nSlack: "+path[4])
+
             writeTocompareInputTable(compareInputData)
+            childData = zip(corners.split(":")[1:],workWeeks.split(":")[1:])
+            client_logger.info("\n\nGenerating for compare path\n\n")
+            #code.interact(local=locals())
+            for cor, ww in childData:
+                try:
+                    load_work_week(ww)
+                except Exception as e:
+                    client_logger.exception("An error occurred in load_work_week while passing ", ww)
+                    #code.interact(local=locals())
+                try:
+                    load_corner(cor)
+                except Exception as e:
+                    client_logger.exception("An error occurred in load_corner while passing ", cor)
+                    #code.interact(local=locals())
+                childCommand = " -from "+path[1]+" -to "+path[2]+" -through {"+path[3].replace(":"," ")+"} -nosplit -input_pins -capacitance -nets -transition"
+                childCommandId = report_timing(childCommand)
+                childReturnData = extractPathInfo(globalVariable.tempLocation)
+                for childPath in childReturnData:
+                    compareInputData = (os.environ.get("USER"),childCommandId,childPath[0],comparePoint,childPath[1],childPath[2],childPath[3],childPath[4],cor,ww,globalVariable.blockName,globalVariable.blockName,globalVariable.project)
+                    client_logger.info("Startpoint: "+childPath[1]+"\n\nEndpoint: "+childPath[2]+"\n\nCorner: "+cor+"\n\nSlack: "+childPath[4])
+                    writeTocompareInputTable(compareInputData)
+                    table.add_row(str(pathCount), cor , childPath[4])
+            #console.print(table)
+            printTable.append(table)
             comparePoint +=1
-        childData = zip(corners.split(":")[1:],workWeeks.split(":")[1:])
-        print(childData)
+        #code.interact(local=locals())
+        print("\n\n\n######################################################\n\nprinting Report")
+        for i in range(0, len(printTable), 3):
+            print("Startpoint: ",printTable[i:i+3][0])
+            print("Endpoint: ",printTable[i:i+3][1],"\n\n")
+            console.print(printTable[i:i+3][2])
+        print ("\n\n##########################################")
+        #print("\nCommand used: report_timing "+command)
+        #print("\nStartpoint: "+path[1])
+        #print("\nEndpoint: "+path[2])
+        #console.print(table)
+        client_logger.info("\n\n#################################################################\n\n")
     else:
-        print("the input command format is incorrect please follow the example\ncompare_timing -work_week 17p2:17p3 -corner 85:55 -command {report_timing -from abc}")
+        client_logger.info("the input command format is incorrect please follow the example\ncompare_timing -work_week 17p2:17p3 -corner 85:55 -command {report_timing -from abc}")
 
 def extractPathInfo(fileName):
     pathCount = 1
     with open(fileName,'r') as file:
         lines = file.readlines()
-        sp_pattern = r"\s+Startpoint: (.*)"
-        ep_pattern = r"\s+Endpoint: (.*)"
-        slack_pattern = r"\s+slack \(.*\)\s+([-]?\d+.\d+).*"
+        sp_pattern = r"\s+Startpoint:\s+(.*?)\s+(.*)"
+        ep_pattern = r"\s+Endpoint:\s+(.*?)\s+(.*)"
+        slack_pattern = r"\s+slack \(.*\).*\s+([-]?\d+.\d+).*$"
         path_start_pattern = r"\s+clock network delay.*"
         pin_pattern = r"\s+(.*?)\s.*"
+        icgPath = 0
         spFlag = 0
         epFlag = 0
         pathStartFlag = 0
@@ -398,10 +470,19 @@ def extractPathInfo(fileName):
                         epFlag = 0
                     match = re.match(pin_pattern,line)
                     if match and pathStartFlag:
+                        match2 = re.match(r"\s+----",line)
+                        if match2:
+                            if (icgPath % 2) == 0:
+                                icgPath += 1
+                            else:
+                                icgPath = icgPath - 1
                         #print(match.group(1))
-                        pinsList.append(match.group(1))
+                        if icgPath == 0:
+                            if not match2:
+                                pinsList.append(match.group(1))
             match = re.match(sp_pattern,line)
             if match:
+                #code.interact(local=locals())
                 startPoint = match.group(1)
                 spFlag = 1
                 #print("startPoint:", startPoint)
