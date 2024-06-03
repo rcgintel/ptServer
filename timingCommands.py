@@ -331,6 +331,7 @@ def history(option=None):
 @log_performance
 def compare_timing(command):
     print(command)
+    ### check the commands correctness before proceding
     #code.interact(local=locals())
     pattern = r"-work_week\s+(.*?)\s+-corner\s+(.*?)-command {(.*)}"
 
@@ -352,10 +353,12 @@ def compare_timing(command):
         client_logger.debug("this command will compare the timing between 2 runs for command "+ command +" on work week "+ workWeeks +" and corners "+ corners)
         #print("run command ",command," on work week ",workWeeks.split(":")[0]," and corner ",corners.split(":")[0])
         #code.interact(local=locals())
+        #breakpoint()
         load_work_week(workWeeks.split(":")[0])
         load_corner(corners.split(":")[0])
         command = " ".join(command.split(" ")[1:])
         commandId = report_timing(command)
+        mainReport = globalVariable.tempLocation
         client_logger.debug(globalVariable.tempLocation)
         returnData = extractPathInfo(globalVariable.tempLocation)
         comparePoint = 0
@@ -379,14 +382,15 @@ def compare_timing(command):
             table.add_column("ID", style="dim", width=6)
             table.add_column("Corner")
             table.add_column("Slack")
+            table.add_column("reportPath")
             #print(compareInputData)
             pathCount +=1
-            table.add_row(str(pathCount), corners.split(":")[0] , path[4])
+            table.add_row(str(pathCount)+"_Main", corners.split(":")[0] , path[4], str(commandId)+"::"+mainReport)
             client_logger.debug("Path"+str(pathCount))
             client_logger.debug("\nStartpoint: "+path[1]+"\n\nEndpoint: "+path[2]+"\n\nCorner: "+corners.split(":")[0]+"\n\nSlack: "+path[4])
 
             writeTocompareInputTable(compareInputData)
-            childData = zip(corners.split(":")[1:],workWeeks.split(":")[1:])
+            childData = zip(corners.split(":")[0:],workWeeks.split(":")[0:])
             client_logger.info("\n\nGenerating for compare path\n\n")
             #code.interact(local=locals())
             for cor, ww in childData:
@@ -407,7 +411,7 @@ def compare_timing(command):
                     compareInputData = (os.environ.get("USER"),childCommandId,childPath[0],comparePoint,childPath[1],childPath[2],childPath[3],childPath[4],cor,ww,globalVariable.blockName,globalVariable.blockName,globalVariable.project)
                     client_logger.info("Startpoint: "+childPath[1]+"\n\nEndpoint: "+childPath[2]+"\n\nCorner: "+cor+"\n\nSlack: "+childPath[4])
                     writeTocompareInputTable(compareInputData)
-                    table.add_row(str(pathCount), cor , childPath[4])
+                    table.add_row(str(pathCount), cor , childPath[4], globalVariable.tempLocation)
             #console.print(table)
             printTable.append(table)
             comparePoint +=1
