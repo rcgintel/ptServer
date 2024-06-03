@@ -105,6 +105,7 @@ def setupDatabase():
 
     CREATE TABLE IF NOT EXISTS machineTrackerTable (
         machineId INT AUTO_INCREMENT PRIMARY KEY,
+        start_time TIME DEFAULT CURRENT_TIME,
         machineName varchar(200) NOT NULL,
         corner varchar(100) NOT NULL,
         status varchar(20) NOT NULL,
