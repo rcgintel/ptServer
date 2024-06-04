@@ -12,6 +12,7 @@ from rich import print
 import mysql.connector
 import datetime
 import functools
+import timingCommands
 
 from log_config import get_client_logger, get_server_logger
 
@@ -89,6 +90,7 @@ def setupDatabase():
 
     cmd = """CREATE TABLE IF NOT EXISTS commandInputTable (
         commandId INT AUTO_INCREMENT PRIMARY KEY,
+        start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
         command TEXT NOT NULL,
         user varchar(20) NOT NULL,
         corner varchar(100) NOT NULL,
@@ -105,7 +107,7 @@ def setupDatabase():
 
     CREATE TABLE IF NOT EXISTS machineTrackerTable (
         machineId INT AUTO_INCREMENT PRIMARY KEY,
-        start_time TIME DEFAULT CURRENT_TIME,
+        start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
         machineName varchar(200) NOT NULL,
         corner varchar(100) NOT NULL,
         status varchar(20) NOT NULL,
@@ -179,17 +181,20 @@ def writeToCommandInputTable(command):
     
     #conn = sqlite3.connect(databaseLocation)
     #cursor = conn.cursor()
+    curTim = datetime.datetime.now()
     cursor = conn.cursor(dictionary=True)
     datas = [
-        (command, corner, user, globalVariable.project, globalVariable.runName, globalVariable.blockName ),
+        (curTim, command, corner, user, globalVariable.project, globalVariable.runName, globalVariable.blockName ),
     ]   
-    sql = "INSERT INTO commandInputTable (command, corner, user, projectName, workWeek, blockName) VALUES (%s, %s, %s, %s, %s, %s)"
+
+    sql = "INSERT INTO commandInputTable (start_time, command, corner, user, projectName, workWeek, blockName) VALUES (%s, %s, %s, %s, %s, %s, %s)"
     #code.interact(local=locals())
     for data in datas:
         cursor.execute(sql, data)
         id = cursor.lastrowid
     conn.commit()
     conn.close()
+    getMachineStatusFromCommandInputTable(id)
     return id
 
 @log_performance("server")
@@ -208,7 +213,7 @@ def writeToMachineTrackerTable(dataSql):
     #conn = sqlite3.connect(databaseLocation)
     cursor = conn.cursor(dictionary = True)
     print(dataSql)
-    sql = "INSERT INTO machineTrackerTable (machineName,corner,status,loads,commandId,workWeek,projectName,blockName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+    sql = "INSERT INTO machineTrackerTable (start_time,machineName,corner,status,loads,commandId,workWeek,projectName,blockName) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     #code.interact(local=locals())
     cursor.execute(sql, dataSql)
     conn.commit()
@@ -486,3 +491,51 @@ def setMachineKilledInMachineTrackerTable(machineName,workWeek,project):
     new_value = "loading"
     condition = "where machineName = \'" + str(machineName) + "\' and workWeek = \'" + str(workWeek) + "\' and projectName = \'"+ str(project)+"\'"
     update_field_in_database(databaseLocation, table, column_to_update, new_value, condition)
+
+
+
+
+@log_performance("client")
+def getMachineStatusFromCommandInputTable(commandId):
+    """
+    Checks if command whose commandId is passed as argument is assigned a machine yet. Returns fail if not assigned in 30 secs
+    """
+    config = configparser.ConfigParser()
+    project = globalVariable.project
+    globalDatabaseName = globalVariable.globalDatabaseName
+    config.read(globalVariable.configFile)
+    databaseLocation = config[project]["database"]
+    #conn = sqlite3.connect(databaseLocation)
+
+    flag = 0
+    #code.interact(local=locals())
+    #sqlcmd = "select complete from "+globalDatabaseName+".commandInputTable where commandId = \'"+str(commandId)+"\';"
+    sqlcmd = "SELECT start_time, machineName FROM {}.commandInputTable WHERE commandId = %s;".format(globalDatabaseName)
+    conn = connectMySql()
+    cursor = conn.cursor()
+    printCount = -1
+    #breakpoint()
+    while flag != 1:
+        #cursor.execute(sqlcmd)
+        cursor.execute(sqlcmd, (commandId,))
+        data = cursor.fetchone()
+        time = data[0]
+        machineName = data[1]
+        delay = datetime.datetime.now() - time
+        #code.interact(local=locals())
+        if (delay.total_seconds() < 10) and machineName == None:
+            flag = 0
+            conn.commit()
+        elif (delay.total_seconds() < 10) and machineName != "":
+            flag = 1
+            conn.commit()
+        elif (delay.total_seconds() > 10) and machineName == None:
+            print("Machine is not assigned please check with SPEO if the corner is running")
+            timingCommands.show_info()
+            sqlcmd = "delete FROM {}.commandInputTable WHERE commandId = %s;".format(globalDatabaseName)
+            cursor.execute(sqlcmd, (commandId,))
+            conn.commit()
+            sys.exit()
+    cursor.close()
+    conn.close()
+    return 1
