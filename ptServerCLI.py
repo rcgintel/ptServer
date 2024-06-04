@@ -230,7 +230,7 @@ readline.parse_and_bind("tab: complete")
 setupDatabase()
 if __name__ == "__main__":
     console = Console()
-    version = 2.2
+    version = 2.3
     console.print("Welcome to ptServer\nVersion : ",version," \n\n\n", style="bold green")
 
     client_logger.debug(log_banner)

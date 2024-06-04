@@ -42,7 +42,7 @@ def background_task(interval_sec):
         for t in getAllAvailbeMachine():
             server_logger.info(f" Background Task : MachineID: {t['machineId']}, Heartbeat: {t['heartBeat']}")
             if t['heartBeat'] > 10:
-                server_logger.warning("Background Task : machine on machineID :"+t["machineId"]+" will be marked killed")
+                server_logger.warning("Background Task : machine on machineID :",t["machineId"]," will be marked killed")
                 setMachineKilledInMachineTrackerTable(t['machineName'],t['workWeek'],t['projectName'])
                 env = config[project]["gtEnv"]
                 wash = config[project]["wash"]
@@ -201,10 +201,10 @@ if not args.restore:
                 commandId = 0
                 workWeek = runName
                 projectName = project
+                dtime = datetime.datetime.now()
                 mySql = (machineName,corner,status,load,commandId,workWeek,projectName,blockName)
                 #print(mySql,":: rcg")
                 writeToMachineTrackerTable(mySql)
-                
     server_logger.info("Invoked all PT Shells")
 
 
@@ -243,4 +243,4 @@ while (flag):
             
         else:
             server_logger.info("PT shell is not yet available for servicing commands")
-    time.sleep(5)
+    time.sleep(1)
