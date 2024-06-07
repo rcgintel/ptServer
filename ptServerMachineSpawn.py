@@ -202,7 +202,7 @@ if not args.restore:
                 workWeek = runName
                 projectName = project
                 dtime = datetime.datetime.now()
-                mySql = (machineName,corner,status,load,commandId,workWeek,projectName,blockName)
+                mySql = (dtime,machineName,corner,status,load,commandId,workWeek,projectName,blockName)
                 #print(mySql,":: rcg")
                 writeToMachineTrackerTable(mySql)
     server_logger.info("Invoked all PT Shells")
