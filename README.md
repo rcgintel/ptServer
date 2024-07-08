@@ -2,6 +2,9 @@
 # Primetime Server
 
 this set of scripts are for enabling a sequential access to primetime server to generate primetime reports there by reducing the primetime requests and infrastructure usage
+
+More about this in this link - check it out
+https://docs.google.com/presentation/d/e/2PACX-1vSIkNM26UrdONx6hMImI352SLTURZW8Z49ck5G1Jes1_49iEmEsBRCYJQ9qjxrwLw/pub?start=false&loop=false&delayms=3000
 ## Documentation
 
 [Documentation](https://github.com/rcgintel/ptServer)
